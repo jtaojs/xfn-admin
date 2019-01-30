@@ -7,7 +7,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import axios from 'axios'
 import Axios from 'axios';
 
-/**全局对象的设置 */
+/**插件和全局对象的设置 */
 Vue.use(ElementUI)//注册Elementui插件
 Vue.prototype.$axios=axios//把axios设置为所有Vue组件实例的成员属性,以后可以使用this.$axios使用异步请求功能
 Vue.config.productionTip = false
@@ -44,10 +44,23 @@ Vue.filter('currency',(val)=>{
   //把int转换为xx.yy
   return '¥'+val.toFixed(2)
 })
+//桌台状态过滤器
+Vue.filter('tableFilter',(val)=>{
+  if(val==1){
+    return '空闲'
+  }else if(val==2){
+    return '预定'
+  }else if(val==3){
+    return '占用'
+  }else{
+    return '其他'
+  }
+})
 
 
 new Vue({
   router,
-  store,
-  render: h => h(App)
+  store,//指定当前项目唯一的Vuex存储仓库对象,其中保存着所有组件共享的数据
+  render: h => h(App)//(createElement)=>{return createElement(App)}根据App组件创建<App><App>元素
 }).$mount('#app')
+//render渲染 渲染一个元素 
