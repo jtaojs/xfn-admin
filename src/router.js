@@ -3,9 +3,6 @@ import Router from 'vue-router'
 import Login from './views/Login.vue'
 import Main from './views/Main.vue'
 import NotFound from './views/NotFound.vue'
-import CategoryAdd from './views/CategoryAdd.vue'
-import CategoryDelete from './views/CategoryDelete.vue'
-import CategoryUpdate from './views/CategoryUpdate.vue'
 import CategoryList from './views/CategoryList.vue'
 import DishAdd from './views/DishAdd.vue'
 import DishDelete from './views/DishDelete.vue'
@@ -38,9 +35,6 @@ export default new Router({
         {path:'/table/update',component:TableUpdate},
         {path:'/table/delete',component:TableDelete},
         {path:'/category/list',component:CategoryList},
-        {path:'/category/add',component:CategoryAdd},
-        {path:'/category/delete',component:CategoryDelete},
-        {path:'/category/update',component:CategoryUpdate},
         {path:'/dish/list',component:DishList},
         {path:'/dish/add',component:DishAdd},
         {path:'/dish/delete',component:DishDelete},
