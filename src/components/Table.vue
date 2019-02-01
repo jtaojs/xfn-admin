@@ -1,23 +1,25 @@
 <template>
     <div class="xfn-table-info">
         <el-card shadow="hover">
-            <div class="xfn-table" :class='{free:data.status==1,appointment:data.status==2,order:data.status==3,others:data.status==0}'>
-                <span>{{data.tid}}号桌:{{data.status==1?'空闲':(data.status==2)?"预约":(data.status==3)?"占用":其他}}</span>
+            <div class="xfn-table" :style="{background:this.getTableColor(data.status)}">
+                <span>{{data.tid}}号桌:{{data.status | tableFilter}}</span>
             </div>
-            <el-button type="success" plain size="mini" @click="dialogVisible = true">详情</el-button>
-            <el-dialog
-            title="提示"
-            :visible.sync="dialogVisible"
-            width="30%"
-            :before-close="handleClose">
-            <span>这是一段信息</span>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = true">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-            </span>
-        </el-dialog>
+            <el-button type="success" plain size="mini" @click="showTableDetail">详情</el-button>
             <el-button type="danger" plain size="mini">修改</el-button>
         </el-card>
+        <!-- 桌台详情对话框 -->
+        <el-dialog :title="data.tid+'号桌台详情'" :visible="dialogTableDetailVisible" :before-close="closeDialogTableDetail">
+            <el-tabs type="border-card" @tab-click="makeQRCode" >
+                <el-tab-pane label="桌台状态">桌台状态</el-tab-pane>
+                <el-tab-pane label="桌台二维码">
+                    <img :src="qrcodeData">
+                </el-tab-pane>
+            </el-tabs>
+            <div slot="footer">
+                <el-button @click="dialogTableDetailVisible=false">取消</el-button>
+                <el-button type="primary" @click="dialogTableDetailVisible=false">确定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -26,33 +28,49 @@ export default {
     props:['data'],
     data(){
         return{
-            dialogVisible:false
+            dialogTableDetailVisible:false,
+            qrcodeData:''//二维码图片数据:base64字符数据
         }
     },
-    
+    methods:{
+        getTableColor(code){
+            if(code==1) return "#67c23a"
+            if(code==2) return "#e6a23c"
+            if(code==3) return "#f56c6c"
+            else return "#909399"
+        },
+        showTableDetail(){
+            //console.log(this.data) 当前桌台数据
+            this.dialogTableDetailVisible=true;
+        },
+        closeDialogTableDetail(){
+            this.dialogTableDetailVisible=false;
+        },
+        makeQRCode(){//创建二维码--注意此方法不能再当前组件的mounted中调用,因为绘图必须得canvas在el-dialog中,对话框加载时不在dom书上
+            var qrcode = require('qrcode')
+            //每个桌子对应的url应该形如   //http://127.0.0.1:8092/#/3
+            var tableUrl= this.$store.state.globalSettings.appUrl+'/#/'+this.data.tid
+            qrcode.toDataURL(tableUrl,{errorCorrectionLevel:'H',width:300},(err,url)=>{
+                //console.log('二维化图片绘制完成',数据如下)
+                //console.log(url)
+                this.qrcodeData=url
+            })
+        }
+    }
 }
 </script>
 
 <style lang="scss">
-    .xfn-table{
-        width:90%;
-        height: 100px;
-        margin: 0 auto 8px;
-        line-height: 100px;
+    .xfn-table-info{
+        padding:3px;
         text-align: center;
-        border-radius: 50%;
-        box-shadow: 5px -5px 5px #888;
-    }
-    .free{
-        background-color: rgb(103, 194, 58)
-    }
-    .appointment{
-        background-color: rgb(230, 162, 60)
-    }
-    .order{
-        background-color:rgb(245, 108, 108)
-    }
-    .others{
-        background-color:rgb(144, 147, 153)
+        .xfn-table{
+            width:90%;
+            height: 100px;
+            margin: 8px auto;
+            line-height: 100px;
+            border-radius: 50%;
+            box-shadow: 5px -5px 5px #888;
+        }
     }
 </style>
